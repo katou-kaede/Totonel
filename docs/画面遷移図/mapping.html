@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Universal Data Bridge - Interactive Prototype</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; height: 100vh; }
+        header { background: #2c3e50; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .main-content { display: flex; flex: 1; overflow: hidden; }
+        
+        /* 左側：利用可能なFrom項目リスト */
+        .from-sidebar { width: 200px; background: white; border-right: 1px solid #ccc; padding: 15px; overflow-y: auto; }
+        .from-item { 
+            background: #e1f5fe; border: 1px solid #03a9f4; padding: 8px; margin-bottom: 8px; 
+            border-radius: 4px; cursor: grab; font-size: 0.9rem; text-align: center;
+        }
+        .from-item:active { cursor: grabbing; opacity: 0.6; }
+
+        /* 中央：マッピングテーブル */
+        .mapping-area { flex: 1; padding: 20px; overflow-y: auto; }
+        .mapping-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .mapping-table th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #dee2e6; text-align: left; }
+        .mapping-table td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; }
+
+        /* ドロップゾーン */
+        .drop-zone { 
+            min-height: 40px; border: 2px dashed #ccc; border-radius: 6px; 
+            display: flex; flex-wrap: wrap; gap: 5px; padding: 5px; align-items: center;
+            transition: background 0.2s;
+        }
+        .drop-zone.drag-over { background: #e8f5e9; border-color: #2e7d32; }
+
+        /* はめ込まれたチップ */
+        .chip { 
+            background: #03a9f4; color: white; padding: 2px 10px; border-radius: 12px; 
+            font-size: 0.8rem; display: flex; align-items: center; 
+        }
+        .chip .remove-btn { margin-left: 8px; cursor: pointer; font-weight: bold; }
+
+        .config-input { padding: 4px; border: 1px solid #ccc; border-radius: 4px; width: 80px; }
+
+        /* オプション設定エリア */
+        .option-settings { display: flex; align-items: center; gap: 10px; }
+        .select-type { padding: 4px; border-radius: 4px; border: 1px solid #ccc; background: #fff; }
+        .extra-input { display: none; padding: 4px; border: 1px solid #ddd; border-radius: 4px; width: 120px; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <strong>Universal Data Bridge Prototype</strong>
+    <button onclick="alert('設定を保存しました（モック）')">保存</button>
+</header>
+
+<div class="main-content">
+    <div class="from-sidebar">
+        <h4>From 項目</h4>
+        <div class="from-item" draggable="true" ondragstart="drag(event)" id="from-1">受注番号</div>
+        <div class="from-item" draggable="true" ondragstart="drag(event)" id="from-2">姓</div>
+        <div class="from-item" draggable="true" ondragstart="drag(event)" id="from-3">名</div>
+        <div class="from-item" draggable="true" ondragstart="drag(event)" id="from-4">電話番号</div>
+        <div class="from-item" draggable="true" ondragstart="drag(event)" id="from-5">予定日</div>
+        <div class="from-item" draggable="true" ondragstart="drag(event)" id="from-6">金額</div>
+    </div>
+
+    <div class="mapping-area">
+        <table class="mapping-table">
+            <thead>
+                <tr>
+                    <th width="30%">出力項目 (To)</th>
+                    <th width="40%">From項目をドロップ</th>
+                    <th width="30%">オプション</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>お客様管理番号</strong></td>
+                    <td><div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></td>
+                    <td>
+                        <div class="option-settings">
+                            <select class="select-type" onchange="toggleOptions(this)">
+                                <option value="none">そのまま出力</option>
+                                <option value="const">固定値</option>
+                                <option value="join">項目結合</option>
+                                <option value="date">日付変換</option>
+                            </select>
+                            <input type="text" class="extra-input const-input" placeholder="値を入力...">
+                            <input type="text" class="extra-input join-input" placeholder="区切り文字...">
+                            <select class="extra-input date-input">
+                                <option>YYYY/MM/DD</option>
+                                <option>YYYYMMDD</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>受取人名称</strong></td>
+                    <td><div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></td>
+                    <td>
+                        <div class="option-settings">
+                            <select class="select-type" onchange="toggleOptions(this)">
+                                <option value="none">そのまま出力</option>
+                                <option value="const">固定値</option>
+                                <option value="join">項目結合</option>
+                                <option value="date">日付変換</option>
+                            </select>
+                            <input type="text" class="extra-input const-input" placeholder="値を入力...">
+                            <input type="text" class="extra-input join-input" placeholder="区切り文字...">
+                            <select class="extra-input date-input">
+                                <option>YYYY/MM/DD</option>
+                                <option>YYYYMMDD</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>発送元コード</strong></td>
+                    <td><div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></td>
+                    <td>
+                        <div class="option-settings">
+                            <select class="select-type" onchange="toggleOptions(this)">
+                                <option value="none">そのまま出力</option>
+                                <option value="const">固定値</option>
+                                <option value="join">項目結合</option>
+                                <option value="date">日付変換</option>
+                            </select>
+                            <input type="text" class="extra-input const-input" placeholder="値を入力...">
+                            <input type="text" class="extra-input join-input" placeholder="区切り文字...">
+                            <select class="extra-input date-input">
+                                <option>YYYY/MM/DD</option>
+                                <option>YYYYMMDD</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // ドラッグ開始時の処理
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.innerText);
+    }
+
+    // ドロップを許可するための処理
+    function allowDrop(ev) {
+        ev.preventDefault();
+        ev.currentTarget.classList.add('drag-over');
+    }
+
+    // ドロップゾーンから離れた時の処理
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.addEventListener('dragleave', (e) => {
+            e.currentTarget.classList.remove('drag-over');
+        });
+    });
+
+    // ドロップされた時の処理
+    function drop(ev) {
+        ev.preventDefault();
+        ev.currentTarget.classList.remove('drag-over');
+        const data = ev.dataTransfer.getData("text");
+        
+        // チップ（バッジ）を生成
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.innerHTML = `${data} <span class="remove-btn" onclick="this.parentElement.remove()">×</span>`;
+        
+        ev.currentTarget.appendChild(chip);
+    }
+
+    // オプション設定
+    function toggleOptions(select) {
+        const row = select.closest('.option-settings');
+        // 一旦すべての入力を隠す
+        row.querySelectorAll('.extra-input').forEach(el => el.style.display = 'none');
+        
+        // 選択されたタイプに合わせて表示
+        const val = select.value;
+        if (val === 'const') row.querySelector('.const-input').style.display = 'inline-block';
+        if (val === 'join') row.querySelector('.join-input').style.display = 'inline-block';
+        if (val === 'date') row.querySelector('.date-input').style.display = 'inline-block';
+    }
+</script>
+
+</body>
+</html>

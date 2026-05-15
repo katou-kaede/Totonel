@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Universal Data Bridge Prototype</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f7f6; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; color: #333; }
+        header { background: var(--primary); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; }
+        .container { padding: 20px; max-width: 1000px; margin: auto; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* カード・ボタンスタイル */
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        button { padding: 10px 20px; cursor: pointer; border-radius: 4px; border: none; background: var(--accent); color: white; font-weight: bold; }
+        button.secondary { background: #95a5a6; }
+
+        /* セット画面用：ヘッダープレビュー */
+        .preview-box { border: 1px solid #ccc; padding: 10px; background: #eee; margin-top: 10px; font-family: monospace; }
+        .row-selector { margin-top: 10px; font-size: 0.9rem; }
+
+        /* マッピング画面用：リスト */
+        .mapping-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .mapping-table td, .mapping-table th { padding: 12px; border-bottom: 1px solid #ddd; background: white; }
+        .drop-zone { min-height: 40px; border: 2px dashed #bbb; background: #fafafa; border-radius: 4px; display: flex; align-items: center; gap: 5px; padding: 5px; }
+        .chip { background: var(--accent); color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <strong>Universal Data Bridge</strong>
+    <span id="current-tmpl-name"></span>
+</header>
+
+<div class="container">
+    <div id="screen-home" class="screen active">
+        <h2>テンプレート選択</h2>
+        <div class="card">
+            <p>保存済みのテンプレート:</p>
+            <select id="tmpl-select" style="width: 100%; padding: 10px; margin-bottom: 20px;">
+                <option value="">-- 選択してください --</option>
+                <option value="sagawa">佐川急便 e飛伝用</option>
+                <option value="yamato">ヤマト B2Cloud用</option>
+            </select>
+            <button onclick="navTo('screen-mapping')">選択したテンプレで実行/編集</button>
+        </div>
+        <hr>
+        <button class="secondary" onclick="navTo('screen-setup')">+ 新規テンプレート作成</button>
+    </div>
+
+    <div id="screen-setup" class="screen">
+        <h2>From/To ファイルセット</h2>
+        <div class="card">
+            <h3>From: 変換元のファイルを指定</h3>
+            <input type="file">
+            <div class="row-selector">
+                ヘッダー開始行: <input type="number" value="1" style="width: 40px;">
+            </div>
+            <div class="preview-box">
+                [プレビュー] 受注番号 | 姓 | 名 | 住所 | ...
+            </div>
+        </div>
+        <div class="card">
+            <h3>To: 出力先の形式（空ファイル）を指定</h3>
+            <input type="file">
+            <div class="preview-box">
+                [プレビュー] お客様管理番号 | 受取人名称 | 郵便番号 | ...
+            </div>
+        </div>
+        <button onclick="navTo('screen-mapping')">次へ：マッピング設定</button>
+        <button class="secondary" onclick="navTo('screen-home')">キャンセル</button>
+    </div>
+
+    <div id="screen-mapping" class="screen">
+        <h2>マッピング設定</h2>
+        <div class="card">
+            <table class="mapping-table">
+                <thead>
+                    <tr>
+                        <th>出力項目 (To)</th>
+                        <th>入力項目 (From) をドロップ</th>
+                        <th>オプション</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>お客様管理番号</td>
+                        <td><div class="drop-zone"><div class="chip">受注番号</div></div></td>
+                        <td>なし</td>
+                    </tr>
+                    <tr>
+                        <td>受取人名称</td>
+                        <td><div class="drop-zone"></div></td>
+                        <td>結合設定: <input type="text" value=" " style="width: 30px;"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="alert('変換完了！出力ファイルを保存しました。')">変換して出力 (Excel/CSV)</button>
+            <button class="secondary" onclick="alert('テンプレートを保存しました。')">設定のみ保存</button>
+            <button class="secondary" onclick="navTo('screen-home')">戻る</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function navTo(screenId) {
+        // すべての画面を非表示にする
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        // 指定した画面を表示する
+        document.getElementById(screenId).classList.add('active');
+        
+        // テンプレ名を表示するおまけ
+        if(screenId === 'screen-mapping') {
+            const sel = document.getElementById('tmpl-select');
+            document.getElementById('current-tmpl-name').innerText = sel.value ? "設定中: " + sel.options[sel.selectedIndex].text : "新規作成中";
+        }
+    }
+</script>
+
+</body>
+</html>
