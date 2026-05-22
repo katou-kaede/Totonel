@@ -56,14 +56,13 @@ function App() {
           </div>
         </button>
 
-        <span className="text-sm flex items-end font-medium px-1.5 py-0.5 mx-3 bg-slate-800 text-slate-400 rounded border border-slate-700/50 group-hover:text-slate-300 group-hover:border-slate-600 transition-colors">
+        <span className="text-sm flex items-end font-medium px-1.5 py-0.5 mx-3 bg-slate-800 text-slate-400 rounded group-hover:text-slate-300 group-hover:border-slate-600 transition-colors">
           v{version}
         </span>
         {/* <div className="px-3 py-1 bg-slate-700/50 rounded-full text-sm uppercase tracking-wider">
           {currentScreen}
           </div> */}
       </header>
-
       <main className="flex-1 overflow-y-auto p-6">
         {currentScreen === 'home' && (
           <HomeScreen onNavigate={handleNavigate} />
