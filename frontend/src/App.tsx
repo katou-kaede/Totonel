@@ -56,7 +56,7 @@ function App() {
           </div>
         </button>
 
-        <span className="text-sm flex items-end font-medium px-1.5 py-0.5 mx-3 bg-slate-800 text-slate-400 rounded border border-slate-700/50 group-hover:text-slate-300 group-hover:border-slate-600 transition-colors">
+        <span className="text-sm flex items-end font-medium px-1.5 py-0.5 mx-3 bg-slate-800 text-slate-400 rounded group-hover:text-slate-300 group-hover:border-slate-600 transition-colors">
           v{version}
         </span>
         {/* <div className="px-3 py-1 bg-slate-700/50 rounded-full text-sm uppercase tracking-wider">
@@ -69,19 +69,19 @@ function App() {
           <HomeScreen onNavigate={handleNavigate} />
         )}
         {currentScreen === 'setup' && (
-          <SetupScreen 
+          <SetupScreen
             templateId={templateId}
             onNavigate={handleNavigate}
           />
         )}
         {currentScreen === 'mapping' && (
-          <MappingScreen 
+          <MappingScreen
             templateId={templateId}
             savedTemplateName={templateName}
-            fromConfig={fromConfig!} 
-            toHeaders={toHeaders} 
+            fromConfig={fromConfig!}
+            toHeaders={toHeaders}
             savedMappings={savedMappings}
-            onNavigate={handleNavigate} 
+            onNavigate={handleNavigate}
           />
         )}
       </main>

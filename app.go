@@ -9,7 +9,8 @@ import (
 	"os"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"gorm.io/driver/sqlite"
+	// "gorm.io/driver/sqlite"  // GCC
+	"github.com/glebarez/sqlite"  // ピュアGo版
 	"gorm.io/gorm"
 
 	"Totonel/internal/models"
@@ -41,7 +42,7 @@ func (a *App) startup(ctx context.Context) {
 	// 	log.Fatal("データベースの接続に失敗しました:", err)
 	// }
 
-	// DB接続(OSごとの保存場所にapp.dbを作成) 
+	// DB接続(OSごとの保存場所にapp.dbを作成)
 	// Windows: Users\ユーザー名\AppData\Roaming\, Mac: Users/ユーザー名/Library/Application Support/, Linux: home/ユーザー名/.config/
 	// ユーザーのアプリデータディレクトリを取得
     configDir, err := os.UserConfigDir()
@@ -51,7 +52,7 @@ func (a *App) startup(ctx context.Context) {
 
     // アプリ専用のフォルダパスを作成 (例: AppName フォルダ)
     appDir := filepath.Join(configDir, "Totonel")
-    
+
     // フォルダがなければ作成
     if _, err := os.Stat(appDir); os.IsNotExist(err) {
         os.MkdirAll(appDir, 0755)
