@@ -9,8 +9,8 @@ import (
 	"os"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	// "gorm.io/driver/sqlite"  // GCC
-	"github.com/glebarez/sqlite"  // ピュアGo版
+	// "gorm.io/driver/sqlite" // GCCが必要
+	"github.com/glebarez/sqlite" // 純Go製のSQLiteドライバ
 	"gorm.io/gorm"
 
 	"Totonel/internal/models"

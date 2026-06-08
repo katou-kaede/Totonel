@@ -63,7 +63,6 @@ function App() {
           {currentScreen}
           </div> */}
       </header>
-
       <main className="flex-1 overflow-y-auto p-6">
         {currentScreen === 'home' && (
           <HomeScreen onNavigate={handleNavigate} />
